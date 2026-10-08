@@ -1,0 +1,153 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Basic Optical Fiber Simulation</title> 
+    <!--  links of HTML to CSS file (edit kARNA HSIN)-->
+    <link rel="stylesheet" href="style.css"> 
+</head> 
+<body> 
+    <h1>Optical Fiber Waveguide Single Page Simulation</h1> 
+    <p>Adjust the sliders below to see how light behaves inside the fiber core.</p> 
+
+    <canvas id="simulationCanvas" width="800" height="300"></canvas> 
+
+    <div class="control-panel"> 
+        <div class="control-group"> 
+            <label for="coreIndex">Core Refractive Index (n₁): <span id="coreVal">1.50</span></label> 
+            <input type="range" id="coreIndex" min="1.30" max="1.70" step="0.01" value="1.50"> 
+        </div> 
+        <div class="control-group"> 
+            <label for="claddingIndex">Cladding Refractive Index (n₂): <span id="cladVal">1.40</span></label> 
+            <input type="range" id="claddingIndex" min="1.30" max="1.70" step="0.01" value="1.40"> 
+        </div> 
+        <div class="control-group" style="grid-column: span 2;"> 
+            <label for="launchAngle">Launch Angle Inside Core (θ): <span id="angleVal">30</span>°</label> 
+            <input type="range" id="launchAngle" min="5" max="85" step="1" value="30"> </div> 
+        <div class="readouts"> 
+            <div>Critical Angle: <span id="critReadout">--</span>°</div> 
+            <div>Simulation Status: <span id="statusReadout" class="status-box">--</span></div> 
+        </div> 
+    </div> 
+
+    <script>
+        // JS 
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        const coreSlider = document.getElementById('coreIndex');
+        const cladSlider = document.getElementById('claddingIndex');
+        const angleSlider = document.getElementById('launchAngle');
+        const coreValText = document.getElementById('coreVal');
+        const cladValText = document.getElementById('cladVal');
+        const angleValText = document.getElementById('angleVal');
+        const critReadout = document.getElementById('critReadout');
+        const statusReadout = document.getElementById('statusReadout');
+
+        function drawSimulation() {
+            const n1 = parseFloat(coreSlider.value);
+            const n2 = parseFloat(cladSlider.value);
+            const thetaDeg = parseFloat(angleSlider.value);
+
+            coreValText.innerText = n1.toFixed(2);
+            cladValText.innerText = n2.toFixed(2);
+            angleValText.innerText = thetaDeg;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#222233';
+            ctx.fillRect(0, 0, canvas.width, 70); 
+            ctx.fillRect(0, canvas.height - 70, canvas.width, 70); 
+
+            ctx.fillStyle = '#2d2d44';
+            ctx.fillRect(0, 70, canvas.width, canvas.height - 140); 
+
+            ctx.strokeStyle = '#555577';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0, 70, canvas.width, canvas.height - 140); 
+
+            ctx.fillStyle = '#8888aa';
+            ctx.font = '14px Arial';
+            ctx.fillText(`Cladding (n₂ = ${n2.toFixed(2)})`, 15, 40);
+            ctx.fillText(`Core (n₁ = ${n1.toFixed(2)})`, 15, 160);
+            ctx.fillText(`Cladding (n₂ = ${n2.toFixed(2)})`, 15, 260);
+
+            if (n1 <= n2) {
+                critReadout.innerText = "N/A";
+                statusReadout.innerText = "ERROR: n₁ must be > n₂";
+                statusReadout.className = "status-box status-fail";
+                return;
+            }
+
+            const criticalAngleRad = Math.asin(n2 / n1);
+            const criticalAngleDeg = criticalAngleRad * (180 / Math.PI);
+            critReadout.innerText = criticalAngleDeg.toFixed(1);
+
+            const incidenceAngle = 90 - thetaDeg;
+
+            let startX = 0;
+            let startY = canvas.height / 2;
+
+            const thetaRad = thetaDeg * (Math.PI / 180);
+            let dx = Math.cos(thetaRad) * 4;
+            let dy = -Math.sin(thetaRad) * 4;
+
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+
+            let currentX = startX;
+            let currentY = startY;
+            let isTrapped = true;
+
+            while (currentX < canvas.width) {
+                currentX += dx;
+                currentY += dy;
+
+                if (currentY <= 70) {
+                    currentY = 70;
+                    if (incidenceAngle >= criticalAngleDeg) {
+                        dy = -dy;
+                    } else {
+                        isTrapped = false;
+                        ctx.lineTo(currentX, currentY);
+                        ctx.strokeStyle = '#ff4d4d';
+                        ctx.lineTo(currentX + dx * 10, currentY + dy * 10);
+                        break;
+                    }
+                }
+
+                if (currentY >= canvas.height - 70) {
+                    currentY = canvas.height - 70;
+                    if (incidenceAngle >= criticalAngleDeg) {
+                        dy = -dy;
+                    } else {
+                        isTrapped = false;
+                        ctx.lineTo(currentX, currentY);
+                        ctx.strokeStyle = '#ff4d4d';
+                        ctx.lineTo(currentX + dx * 10, currentY + dy * 10);
+                        break;
+                    }
+                }
+                ctx.lineTo(currentX, currentY);
+            }
+
+            if (isTrapped) {
+                ctx.strokeStyle = '#00ffcc';
+                statusReadout.innerText = "TIR Achieved (Signal Trapped)";
+                statusReadout.className = "status-box status-success";
+            } else {
+                statusReadout.innerText = "Light Leaked (Angle Too Steep)";
+                statusReadout.className = "status-box status-fail";
+            }
+            ctx.stroke();
+        }
+
+        coreSlider.addEventListener('input', drawSimulation);
+        cladSlider.addEventListener('input', drawSimulation);
+        angleSlider.addEventListener('input', drawSimulation);
+        drawSimulation();
+    </script> 
+    <h1><em>Made by Drushti Ludbe 🤍</em></h1>
+</body> 
+</html>
