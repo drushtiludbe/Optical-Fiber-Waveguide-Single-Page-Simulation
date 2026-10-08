@@ -9,14 +9,14 @@ body {
     align-items: center; 
 } 
 
-em {
+h4 {
   font-family: Georgia, 'Times New Roman', Times, serif;
   margin: 0;
   padding: 20px;
   display: flex ;
   flex-direction: column;
   align-items: last baseline;
-  color: #ff00aa;
+  color: #ffffff;
  }
 
 h1 { 
