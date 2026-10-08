@@ -1,1 +1,93 @@
+body { 
+    font-family: Arial, sans-serif; 
+    background-color: #cc92b9; 
+    color: #270025; 
+    margin: 0; 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+} 
+
+h4 {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin: 0;
+  padding: 20px;
+  display: flex ;
+  flex-direction: column;
+  align-items: last baseline;
+  color: #270025ff;
+ }
+
+h1 { 
+    margin-bottom: 10px; 
+    color: #ffffff; 
+} 
+
+p { 
+    margin: 0 0 20px 0; 
+    color: #20001b; 
+} 
+
+#simulationCanvas { 
+    background-color: #f09bd3; 
+    border: 2px solid #e0e0eb; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 15px rgba(53, 7, 53, 0.5); 
+} 
+
+.control-panel { 
+    background-color: #240c23; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-top: 20px; 
+    width: 760px; 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+    box-shadow: 0 4px 10px rgba(250, 249, 249, 0.3); 
+} 
+
+.control-group { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+} 
+
+label { 
+    font-weight: bold; 
+    color: #e0e0e0; 
+} 
+
+input[type="range"] { 
+    width: 100%; 
+    cursor: pointer; 
+} 
+
+.readouts { 
+    grid-column: span 2; 
+    background-color: #5e3157; 
+    padding: 12px; 
+    border-radius: 6px; 
+    display: flex; 
+    justify-content: space-around; 
+    border-left: 4px solid #fffff; 
+} 
+
+.status-box { 
+    font-weight: bold; 
+    padding: 2px 8px; 
+    border-radius: 4px; 
+} 
+
+.status-success { 
+    background-color: #068b18; 
+    color: #ffffff; 
+} 
+
+.status-fail { 
+    background-color: #fa0303; 
+    color: #ffffff; 
+}
+
 
